@@ -1,83 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Serviços em Atibaia</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 20px;
-      color: #333;
-    }
-    h1 {
+      background: #fefefe;
       text-align: center;
-      color: #8a2be2;
+      padding: 20px;
     }
+
+    h1 {
+      color: #9933ff;
+    }
+
     input {
       padding: 10px;
-      width: 100%;
-      max-width: 400px;
-      margin: 20px auto;
-      display: block;
-      border-radius: 5px;
+      width: 300px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
+      border-radius: 5px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      margin-top: 10px;
     }
+
     th, td {
       padding: 12px;
       border: 1px solid #ddd;
-      text-align: left;
     }
+
     th {
-      background-color: #e6ddff;
-      color: #000;
+      background: #e6d9ff;
+      font-weight: bold;
     }
-    tr:hover {
-      background-color: #f1f1f1;
+
+    td {
+      background: #f9f9ff;
     }
+
     .footer {
-      text-align: center;
-      margin-top: 40px;
+      margin-top: 30px;
+      color: #777;
       font-size: 14px;
-      color: #888;
     }
   </style>
 </head>
 <body>
   <h1>Serviços em Atibaia</h1>
-  <input type="text" id="search" placeholder="Buscar por especialidade...">
 
-  <table id="data-table">
-    <thead>
-      <tr>
-        <th>ESPECIALIDADE</th>
-        <th>NOME</th>
-        <th>CONTATO</th>
-        <th>QUEM INDICOU</th>
-        <th>OBSERVAÇÕES</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <div class="footer">Atualizado automaticamente a partir da planilha do Google Sheets.</div>
-
-  <script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/1maOPaJn9attovo_mr-enOguq5BF2aTZadroKZ9seb9U/gviz/tq?tqx=out:csv&sheet=Servi%C3%A7os%20em%20Atibaia';
-
-    async function loadSheetData() {
-      const res = await fetch(sheetURL);
-      const text = await res.text();
-      const rows = text.split('\n').map(row => row.split(','));
-      const tbody = document.querySelector('#data-table tbody');
-      tbody.innerHTML = '';
-
-      for (let i = 1; i < rows.length; i++) {
-        const tr = document
+  <input type="text" id="search" placeholder="Buscar por especialidade
