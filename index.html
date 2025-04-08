@@ -1,90 +1,83 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buscar Fornecedores</title>
+  <title>Serviços em Atibaia</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f9f9f9;
       padding: 20px;
-      background: #f4f4f4;
+      color: #333;
     }
     h1 {
       text-align: center;
+      color: #8a2be2;
     }
-    input[type="text"] {
-      width: 100%;
+    input {
       padding: 10px;
-      margin-bottom: 20px;
-      font-size: 16px;
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      display: block;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
+      margin-top: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
     th, td {
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ddd;
       text-align: left;
     }
     th {
-      background-color: #f0f0f0;
+      background-color: #e6ddff;
+      color: #000;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <h1>Buscar Fornecedores</h1>
+  <h1>Serviços em Atibaia</h1>
   <input type="text" id="search" placeholder="Buscar por especialidade...">
-  <table id="tabela">
+
+  <table id="data-table">
     <thead>
       <tr>
-        <th>Especialidade</th>
-        <th>Nome</th>
-        <th>Contato</th>
-        <th>Quem Indicou</th>
-        <th>Observações</th>
+        <th>ESPECIALIDADE</th>
+        <th>NOME</th>
+        <th>CONTATO</th>
+        <th>QUEM INDICOU</th>
+        <th>OBSERVAÇÕES</th>
       </tr>
     </thead>
-    <tbody id="dados"></tbody>
+    <tbody></tbody>
   </table>
 
+  <div class="footer">Atualizado automaticamente a partir da planilha do Google Sheets.</div>
+
   <script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/1maOPaJn9attovo_mr-enOguq5BF2aTZadroKZ9seb9U/pub?output=csv';
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTt_qBJzPiSSlfU2KY-FszXMHkAm8-r6QAZXFiqKUBvYqgWaM9c1i8YGqkPi-yqv2lljYosXpWvn7z4/pub?output=csv';
 
-    async function carregarDados() {
-      const resposta = await fetch(sheetURL);
-      const texto = await resposta.text();
-      const linhas = texto.split('\n').map(l => l.split(','));
-      const dados = linhas.slice(1);
-
-      const tbody = document.getElementById('dados');
+    async function loadSheetData() {
+      const res = await fetch(sheetURL);
+      const text = await res.text();
+      const rows = text.split('\n').map(row => row.split(','));
+      const tbody = document.querySelector('#data-table tbody');
       tbody.innerHTML = '';
 
-      dados.forEach(linha => {
-        if (linha.length >= 5) {
-          const tr = document.createElement('tr');
-          linha.slice(0, 5).forEach(celula => {
-            const td = document.createElement('td');
-            td.textContent = celula;
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        }
-      });
-    }
-
-    document.getElementById('search').addEventListener('input', function () {
-      const termo = this.value.toLowerCase();
-      const linhas = document.querySelectorAll('#dados tr');
-      linhas.forEach(linha => {
-        const especialidade = linha.children[0].textContent.toLowerCase();
-        linha.style.display = especialidade.includes(termo) ? '' : 'none';
-      });
-    });
-
-    carregarDados();
-  </script>
-</body>
-</html>
+      for (let i = 1; i < rows.length; i++) {
+        const tr = document
