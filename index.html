@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscar Fornecedores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Buscar Fornecedores</h1>
+  <input type="text" id="search" placeholder="Buscar por especialidade...">
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th>Especialidade</th>
+        <th>Nome</th>
+        <th>Contato</th>
+        <th>Quem Indicou</th>
+        <th>Observações</th>
+      </tr>
+    </thead>
+    <tbody id="dados"></tbody>
+  </table>
+
+  <script>
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7evxz8X9kR5IK6PbIhGylRZdY1WqXc1WqgO7FfeCUH8zVRwb-2sKe0fov6RH9Lq2O6FZ04SnNwQvG/pub?output=csv';
+
+    async function carregarDados() {
+      const resposta = await fetch(sheetURL);
+      const texto = await resposta.text();
+      const linhas = texto.split('\n').map(l => l.split(','));
+      const dados = linhas.slice(1);
+
+      const tbody = document.getElementById('dados');
+      tbody.innerHTML = '';
+
+      dados.forEach(linha => {
+        if (linha.length >= 5) {
+          const tr = document.createElement('tr');
+          linha.slice(0, 5).forEach(celula => {
+            const td = document.createElement('td');
+            td.textContent = celula;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    document.getElementById('search').addEventListener('input', function () {
+      const termo = this.value.toLowerCase();
+      const linhas = document.querySelectorAll('#dados tr');
+      linhas.forEach(linha => {
+        const especialidade = linha.children[0].textContent.toLowerCase();
+        linha.style.display = especialidade.includes(termo) ? '' : 'none';
+      });
+    });
+
+    carregarDados();
+  </script>
+</body>
+</html>
