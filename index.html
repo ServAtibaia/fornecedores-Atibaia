@@ -2,52 +2,68 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Serviços em Atibaia</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
+      padding: 1rem;
+      margin: 0;
+      text-align: center;
+      background-color: #fefefe;
     }
     h1 {
-      color: #6610f2;
+      color: #9b2fff;
+      font-size: 2rem;
     }
-    input[type="text"] {
-      padding: 10px;
-      font-size: 16px;
-      margin: 20px 0;
+    input {
+      padding: 0.6rem;
+      font-size: 1rem;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
+      margin: 1rem auto;
+      display: block;
+      border-radius: 5px;
+      border: 1px solid #aaa;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 1rem;
+      overflow-x: auto;
+      display: block;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+      word-break: break-word;
     }
     th {
-      background-color: #eee;
+      background-color: #e8d9ff;
     }
-    footer {
-      margin-top: 20px;
-      font-size: 12px;
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
       color: #666;
-      text-align: center;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      th, td {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
     }
   </style>
 </head>
 <body>
-
   <h1>Serviços em Atibaia</h1>
-
   <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
 
-  <table id="resultTable">
+  <table id="dataTable">
     <thead>
       <tr>
         <th>ESPECIALIDADE</th>
@@ -57,53 +73,46 @@
         <th>OBSERVAÇÕES</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="tableBody"></tbody>
   </table>
 
-  <footer>Dados carregados automaticamente da planilha do Google Sheets.</footer>
+  <div class="footer">
+    Atualizado automaticamente a partir da planilha do Google Sheets.
+  </div>
 
   <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
-    const tabela = document.querySelector("#resultTable tbody");
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
+
     const searchInput = document.getElementById("searchInput");
-    let dadosOriginais = [];
+    const tableBody = document.getElementById("tableBody");
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function (results) {
-        dadosOriginais = results.data;
-        renderTabela(dadosOriginais);
-      }
-    });
-
-    function renderTabela(dados) {
-      tabela.innerHTML = "";
-
-      dados.forEach(row => {
+    function renderTable(data, filter = "") {
+      tableBody.innerHTML = "";
+      data.forEach(row => {
+        const especialidade = row[0] || "";
+        if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
         const tr = document.createElement("tr");
-        const colunas = ["ESPECIALIDADE", "NOME", "CONTATO", "QUEM INDICOU", "OBSERVAÇÕES"];
-
-        colunas.forEach(coluna => {
-          const chave = Object.keys(row).find(k => k.trim().toLowerCase() === coluna.toLowerCase());
+        for (let i = 0; i < 5; i++) {
           const td = document.createElement("td");
-          td.textContent = row[chave]?.trim() || "";
+          td.textContent = row[i] || "";
           tr.appendChild(td);
-        });
-
-        tabela.appendChild(tr);
+        }
+        tableBody.appendChild(tr);
       });
     }
 
-    searchInput.addEventListener("input", function () {
-      const termo = this.value.toLowerCase();
-      const filtrado = dadosOriginais.filter(row =>
-        row["ESPECIALIDADE"]?.toLowerCase().includes(termo)
-      );
-      renderTabela(filtrado);
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: false,
+      complete: function(results) {
+        const allData = results.data.slice(1); // remove cabeçalho
+        renderTable(allData);
+        searchInput.addEventListener("input", () => {
+          const filter = searchInput.value.trim();
+          renderTable(allData, filter);
+        });
+      }
     });
   </script>
-
 </body>
 </html>
