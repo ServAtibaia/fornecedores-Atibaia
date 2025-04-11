@@ -1,15 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- ... meta tags e links permanecem iguais ... -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Lista de serviços disponíveis em Atibaia" />
+  <meta name="keywords" content="serviços, Atibaia, prestadores" />
+  <title>Serviços em Atibaia</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#800080">
+  <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+  
+  <link rel="preconnect" href="https://docs.google.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  
   <style>
-    /* ... estilos anteriores permanecem iguais ... */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fefefe;
+    }
+
+    h1 {
+      color: #800080;
+      text-align: center;
+      margin: 1rem;
+      font-size: 1.8rem;
+    }
+
+    .search-container {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #searchInput {
+      width: 100%;
+      max-width: 500px;
+      display: block;
+      margin: 0 auto;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #800080;
+      box-shadow: 0 2px 8px rgba(128,0,128,0.2);
+    }
 
     .table-container {
       overflow-x: auto;
       padding: 0 1rem;
       width: 100%;
-      -webkit-overflow-scrolling: touch; /* Melhor scroll no iOS */
+      -webkit-overflow-scrolling: touch;
     }
 
     table {
@@ -19,7 +70,7 @@
       background-color: #d0f0d0;
       font-size: 0.9rem;
       margin-top: 1rem;
-      table-layout: fixed; /* Importante para controle de largura */
+      table-layout: fixed;
     }
 
     th, td {
@@ -28,17 +79,56 @@
       vertical-align: top;
     }
 
-    /* Definindo larguras específicas para cada coluna */
-    th:nth-child(1), td:nth-child(1) { width: 20%; } /* Especialidade */
-    th:nth-child(2), td:nth-child(2) { width: 20%; } /* Nome */
+    th:nth-child(1), td:nth-child(1) { width: 20%; }
+    th:nth-child(2), td:nth-child(2) { width: 20%; }
     th:nth-child(3), td:nth-child(3) { 
       width: 15%; 
-      white-space: nowrap; /* Impede quebra de linha */
-    } /* Contato */
-    th:nth-child(4), td:nth-child(4) { width: 20%; } /* Quem Indicou */
-    th:nth-child(5), td:nth-child(5) { width: 25%; } /* Observações */
+      white-space: nowrap;
+    }
+    th:nth-child(4), td:nth-child(4) { width: 20%; }
+    th:nth-child(5), td:nth-child(5) { width: 25%; }
 
-    /* ... resto dos estilos permanecem iguais ... */
+    th {
+      background-color: #3f88c5;
+      color: white;
+      font-weight: bold;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    th:hover {
+      background-color: #2d6494;
+    }
+
+    tr:nth-child(even) {
+      background-color: #e6ffe6;
+    }
+
+    .loading td {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .no-results td {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .footer {
+      text-align: center;
+      margin: 2rem 1rem;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .offline-message {
+      background-color: #ff9800;
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      display: none;
+    }
 
     @media (max-width: 768px) {
       table, thead, tbody, th, td, tr {
@@ -46,18 +136,83 @@
       }
       
       th:nth-child(3), td:nth-child(3) {
-        min-width: 120px; /* Garante espaço mínimo para números */
+        min-width: 120px;
       }
     }
 
-    /* ... resto do CSS permanece igual ... */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      #searchInput {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- ... resto do HTML permanece igual ... -->
+  <div id="offlineMessage" class="offline-message">
+    Você está offline. Usando dados em cache.
+  </div>
+
+  <h1>Serviços em Atibaia</h1>
   
+  <div class="search-container">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Buscar por especialidade..." 
+      aria-label="Buscar por especialidade"
+    />
+  </div>
+
+  <div class="table-container">
+    <table id="dataTable" aria-label="Lista de serviços em Atibaia">
+      <thead>
+        <tr>
+          <th role="columnheader" aria-sort="none">ESPECIALIDADE</th>
+          <th role="columnheader" aria-sort="none">NOME</th>
+          <th role="columnheader" aria-sort="none">CONTATO</th>
+          <th role="columnheader" aria-sort="none">QUEM INDICOU</th>
+          <th role="columnheader" aria-sort="none">OBSERVAÇÕES</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Atualizado automaticamente a partir da planilha do Google Sheets.
+  </div>
+
   <script>
-    // ... código anterior permanece igual ...
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.getElementById("tableBody");
+    const offlineMessage = document.getElementById("offlineMessage");
+    let allData = [];
+
+    window.addEventListener('online', () => {
+      offlineMessage.style.display = 'none';
+    });
+    
+    window.addEventListener('offline', () => {
+      offlineMessage.style.display = 'block';
+    });
+
+    function showLoading() {
+      tableBody.innerHTML = '<tr class="loading"><td colspan="5">Carregando dados...</td></tr>';
+    }
+
+    function showError() {
+      tableBody.innerHTML = '<tr class="loading"><td colspan="5">Erro ao carregar dados. Por favor, tente novamente mais tarde.</td></tr>';
+    }
+
+    function showNoResults() {
+      tableBody.innerHTML = '<tr class="no-results"><td colspan="5">Nenhum resultado encontrado</td></tr>';
+    }
 
     function formatPhoneNumber(text) {
       if (!text) return '';
@@ -65,6 +220,15 @@
         /(\(?[0-9]{2}\)?\s?[0-9]{4,5}-?[0-9]{4})/g,
         '<strong>$1</strong>'
       );
+    }
+
+    function sortTable(column) {
+      allData.sort((a, b) => {
+        const valueA = (a[column] || "").toLowerCase();
+        const valueB = (b[column] || "").toLowerCase();
+        return valueA.localeCompare(valueB);
+      });
+      renderTable(allData, searchInput.value.trim());
     }
 
     function renderTable(data, filter = "") {
@@ -83,7 +247,7 @@
           const tr = document.createElement("tr");
           for (let i = 0; i < 5; i++) {
             const td = document.createElement("td");
-            if (i === 2) { // Coluna de contato
+            if (i === 2) {
               td.innerHTML = formatPhoneNumber(row[i] || "");
             } else {
               td.textContent = row[i] || "";
@@ -98,7 +262,52 @@
       }
     }
 
-    // ... resto do JavaScript permanece igual ...
+    document.querySelectorAll('th').forEach((th, index) => {
+      th.addEventListener('click', () => sortTable(index));
+    });
+
+    const cachedData = localStorage.getItem('tableData');
+    if (cachedData) {
+      allData = JSON.parse(cachedData);
+      renderTable(allData);
+    }
+
+    showLoading();
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: false,
+      complete: function(results) {
+        try {
+          allData = results.data.slice(1);
+          localStorage.setItem('tableData', JSON.stringify(allData));
+          renderTable(allData);
+          
+          searchInput.addEventListener("input", () => {
+            const filter = searchInput.value.trim();
+            renderTable(allData, filter);
+          });
+        } catch (error) {
+          console.error("Erro ao processar dados:", error);
+          showError();
+        }
+      },
+      error: function(error) {
+        console.error("Erro ao carregar dados:", error);
+        showError();
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registrado com sucesso:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Falha ao registrar ServiceWorker:', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>
