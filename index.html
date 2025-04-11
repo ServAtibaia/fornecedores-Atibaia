@@ -12,13 +12,16 @@
       margin: 0;
       text-align: center;
       background-color: #fefefe;
+      font-size: 16px;
     }
+
     h1 {
       color: #9b2fff;
       font-size: 2rem;
     }
+
     input {
-      padding: 0.6rem;
+      padding: 0.5rem;
       font-size: 1rem;
       width: 100%;
       max-width: 500px;
@@ -27,6 +30,7 @@
       border-radius: 5px;
       border: 1px solid #aaa;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -34,27 +38,38 @@
       overflow-x: auto;
       display: block;
     }
+
     th, td {
       border: 1px solid #ddd;
-      padding: 0.75rem;
+      padding: 0.5rem;
       text-align: left;
       word-break: break-word;
     }
+
     th {
       background-color: #e8d9ff;
     }
+
     .footer {
       margin-top: 2rem;
       font-size: 0.9rem;
       color: #666;
     }
+
     @media (max-width: 600px) {
+      body {
+        font-size: 14px;
+      }
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
       }
       th, td {
-        font-size: 0.9rem;
-        padding: 8px;
+        font-size: 0.85rem;
+        padding: 6px;
+      }
+      input {
+        font-size: 0.95rem;
+        padding: 0.4rem;
       }
     }
   </style>
@@ -86,29 +101,15 @@
     const searchInput = document.getElementById("searchInput");
     const tableBody = document.getElementById("tableBody");
 
-    function makeLinkIfURL(text) {
-      const urlPattern = /(https?:\/\/[^\s]+)/g;
-      if (urlPattern.test(text)) {
-        return `<a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-      }
-      return text;
-    }
-
-    function cleanText(text) {
-      return (text || "").replace(/\n/g, " ").trim(); // remove quebras de linha e espaços extras
-    }
-
     function renderTable(data, filter = "") {
       tableBody.innerHTML = "";
-      data.forEach((row, index) => {
-        if (index === 0) return; // pula a linha de cabeçalho
-        const especialidade = cleanText(row[0]);
+      data.forEach(row => {
+        const especialidade = row[0] || "";
         if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
-
         const tr = document.createElement("tr");
         for (let i = 0; i < 5; i++) {
           const td = document.createElement("td");
-          td.innerHTML = makeLinkIfURL(cleanText(row[i]));
+          td.textContent = row[i] || "";
           tr.appendChild(td);
         }
         tableBody.appendChild(tr);
@@ -119,7 +120,7 @@
       download: true,
       header: false,
       complete: function(results) {
-        const allData = results.data;
+        const allData = results.data.slice(1); // remove cabeçalho
         renderTable(allData);
         searchInput.addEventListener("input", () => {
           const filter = searchInput.value.trim();
