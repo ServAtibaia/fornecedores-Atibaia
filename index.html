@@ -34,16 +34,17 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
+      table-layout: auto;
       background-color: #d0f0d0;
       font-size: 0.9rem;
+      word-wrap: break-word;
     }
 
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      word-wrap: break-word;
       vertical-align: top;
+      white-space: normal;
     }
 
     th {
@@ -53,6 +54,11 @@
 
     tr:nth-child(even) {
       background-color: #e6ffe6;
+    }
+
+    td a {
+      color: #006600;
+      word-break: break-all;
     }
 
     .footer {
@@ -108,7 +114,13 @@
         const tr = document.createElement("tr");
         for (let i = 0; i < 5; i++) {
           const td = document.createElement("td");
-          td.innerHTML = row[i] || "";
+          // transforma links em <a>
+          const cell = (row[i] || "").toString();
+          if (cell.startsWith("http")) {
+            td.innerHTML = `<a href="${cell}" target="_blank">${cell}</a>`;
+          } else {
+            td.innerHTML = cell;
+          }
           tr.appendChild(td);
         }
         tableBody.appendChild(tr);
