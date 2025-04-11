@@ -8,7 +8,6 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 1rem;
       margin: 0;
       background-color: #fefefe;
     }
@@ -16,47 +15,49 @@
     h1 {
       color: #800080;
       text-align: center;
-      margin-bottom: 1rem;
+      margin: 1rem;
       font-size: 1.8rem;
+    }
+
+    .sticky-input {
+      position: sticky;
+      top: 0;
+      background-color: #fefefe;
+      padding: 1rem;
+      z-index: 100;
     }
 
     input {
       width: 100%;
       max-width: 500px;
       padding: 0.5rem;
-      margin: 0 auto 1rem;
+      margin: 0 auto;
       display: block;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
-      position: sticky;
-      top: 0;
-      background-color: white;
-      z-index: 2;
-    }
-
-    .table-container {
-      overflow-x: auto;
     }
 
     table {
-      min-width: 800px;
       width: 100%;
       border-collapse: collapse;
       table-layout: auto;
       background-color: #d0f0d0;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      overflow-x: auto;
     }
 
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      white-space: nowrap;
-      vertical-align: top;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     th {
-      background-color: #b0e0b0;
+      background-color: #3399ff; /* azul Excel */
+      color: white;
       font-weight: bold;
     }
 
@@ -66,40 +67,46 @@
 
     .footer {
       text-align: center;
-      margin-top: 2rem;
+      margin: 2rem 0;
       font-size: 0.85rem;
       color: #666;
     }
 
     @media (max-width: 768px) {
       table, thead, tbody, th, td, tr {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
       }
 
       input {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
       }
     }
   </style>
 </head>
 <body>
   <h1>Serviços em Atibaia</h1>
-  <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
-
-  <div class="table-container">
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th>ESPECIALIDADE</th>
-          <th>NOME</th>
-          <th>CONTATO</th>
-          <th>QUEM INDICOU</th>
-          <th>OBSERVAÇÕES</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+  <div class="sticky-input">
+    <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
   </div>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>ESPECIALIDADE</th>
+        <th>NOME</th>
+        <th>CONTATO</th>
+        <th>QUEM INDICOU</th>
+        <th>OBSERVAÇÕES</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
 
   <div class="footer">
     Atualizado automaticamente a partir da planilha do Google Sheets.
