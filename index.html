@@ -51,4 +51,74 @@
     }
     .footer {
       margin-top: 2rem;
-      font-size: 0
+      font-size: 0.9rem;
+      color: #666;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      th, td {
+        font-size: 0.85rem;
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Serviços em Atibaia</h1>
+  <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>ESPECIALIDADE</th>
+        <th>NOME</th>
+        <th>CONTATO</th>
+        <th>QUEM INDICOU</th>
+        <th>OBSERVAÇÕES</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="footer">
+    Atualizado automaticamente a partir da planilha do Google Sheets.
+  </div>
+
+  <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
+
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.getElementById("tableBody");
+
+    function renderTable(data, filter = "") {
+      tableBody.innerHTML = "";
+      data.forEach(row => {
+        const especialidade = row[0] || "";
+        if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
+        const tr = document.createElement("tr");
+        for (let i = 0; i < 5; i++) {
+          const td = document.createElement("td");
+          td.textContent = row[i] || "";
+          tr.appendChild(td);
+        }
+        tableBody.appendChild(tr);
+      });
+    }
+
+    Papa.parse(sheetUrl, {
+      download: true,
+      header: false,
+      complete: function(results) {
+        const allData = results.data.slice(1); // remove cabeçalho
+        renderTable(allData);
+        searchInput.addEventListener("input", () => {
+          const filter = searchInput.value.trim();
+          renderTable(allData, filter);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
