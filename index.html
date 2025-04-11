@@ -50,8 +50,18 @@
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      word-break: break-word;
       vertical-align: top;
+    }
+
+    td {
+      max-width: 1px;
+      white-space: nowrap;
+      overflow-wrap: anywhere;
+    }
+
+    td a {
+      white-space: nowrap;
+      overflow-wrap: anywhere;
     }
 
     th {
@@ -130,7 +140,7 @@
       download: true,
       header: false,
       complete: function(results) {
-        const allData = results.data.slice(1);
+        const allData = results.data.slice(1); // remove cabeçalho
         renderTable(allData);
         searchInput.addEventListener("input", () => {
           const filter = searchInput.value.trim();
