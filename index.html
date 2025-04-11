@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Lista de serviços disponíveis em Atibaia" />
+  <meta name="keywords" content="serviços, Atibaia, prestadores" />
   <title>Serviços em Atibaia</title>
+  
+  <link rel="preconnect" href="https://docs.google.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,40 +25,53 @@
       font-size: 1.8rem;
     }
 
-    #searchInput {
+    .search-container {
       position: sticky;
       top: 0;
       z-index: 10;
       background: white;
-      padding: 0.5rem;
-      margin: 0 auto 1rem;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #searchInput {
       width: 100%;
       max-width: 500px;
       display: block;
+      margin: 0 auto;
+      padding: 0.8rem;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #800080;
+      box-shadow: 0 2px 8px rgba(128,0,128,0.2);
     }
 
     .table-container {
-      overflow-x: auto; /* Habilita scroll horizontal */
+      overflow-x: auto;
       padding: 0 1rem;
       width: 100%;
     }
 
     table {
       width: 100%;
-      min-width: 1000px; /* força a tabela a passar da tela e ativar o scroll */
+      min-width: 1000px;
       border-collapse: collapse;
       background-color: #d0f0d0;
       font-size: 0.9rem;
+      margin-top: 1rem;
     }
 
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      white-space: normal; /* permite quebra de linha */
-      word-break: break-word; /* quebra frases longas */
+      white-space: normal;
+      word-break: break-word;
       overflow-wrap: anywhere;
       vertical-align: top;
     }
@@ -62,10 +81,26 @@
       color: white;
       font-weight: bold;
       text-align: left;
+      cursor: pointer;
+    }
+
+    th:hover {
+      background-color: #2d6494;
     }
 
     tr:nth-child(even) {
       background-color: #e6ffe6;
+    }
+
+    .loading td {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .no-results td {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
     }
 
     .footer {
@@ -80,21 +115,40 @@
         font-size: 0.8rem;
       }
     }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      #searchInput {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Serviços em Atibaia</h1>
-  <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
+  
+  <div class="search-container">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Buscar por especialidade..." 
+      aria-label="Buscar por especialidade"
+    />
+  </div>
 
   <div class="table-container">
-    <table id="dataTable">
+    <table id="dataTable" aria-label="Lista de serviços em Atibaia">
       <thead>
         <tr>
-          <th>ESPECIALIDADE</th>
-          <th>NOME</th>
-          <th>CONTATO</th>
-          <th>QUEM INDICOU</th>
-          <th>OBSERVAÇÕES</th>
+          <th role="columnheader" aria-sort="none">ESPECIALIDADE</th>
+          <th role="columnheader" aria-sort="none">NOME</th>
+          <th role="columnheader" aria-sort="none">CONTATO</th>
+          <th role="columnheader" aria-sort="none">QUEM INDICOU</th>
+          <th role="columnheader" aria-sort="none">OBSERVAÇÕES</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -107,36 +161,92 @@
 
   <script>
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
-
     const searchInput = document.getElementById("searchInput");
     const tableBody = document.getElementById("tableBody");
+    let allData = [];
 
-    function renderTable(data, filter = "") {
-      tableBody.innerHTML = "";
-      data.forEach(row => {
-        const especialidade = row[0] || "";
-        if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
-
-        const tr = document.createElement("tr");
-        for (let i = 0; i < 5; i++) {
-          const td = document.createElement("td");
-          td.textContent = row[i] || "";
-          tr.appendChild(td);
-        }
-        tableBody.appendChild(tr);
-      });
+    function showLoading() {
+      tableBody.innerHTML = '<tr class="loading"><td colspan="5">Carregando dados...</td></tr>';
     }
 
+    function showError() {
+      tableBody.innerHTML = '<tr class="loading"><td colspan="5">Erro ao carregar dados. Por favor, tente novamente mais tarde.</td></tr>';
+    }
+
+    function showNoResults() {
+      tableBody.innerHTML = '<tr class="no-results"><td colspan="5">Nenhum resultado encontrado</td></tr>';
+    }
+
+    function sortTable(column) {
+      allData.sort((a, b) => {
+        const valueA = (a[column] || "").toLowerCase();
+        const valueB = (b[column] || "").toLowerCase();
+        return valueA.localeCompare(valueB);
+      });
+      renderTable(allData, searchInput.value.trim());
+    }
+
+    function renderTable(data, filter = "") {
+      try {
+        tableBody.innerHTML = "";
+        const filteredData = data.filter(row => 
+          row[0].toLowerCase().includes(filter.toLowerCase())
+        );
+
+        if (filteredData.length === 0) {
+          showNoResults();
+          return;
+        }
+
+        filteredData.forEach(row => {
+          const tr = document.createElement("tr");
+          for (let i = 0; i < 5; i++) {
+            const td = document.createElement("td");
+            td.textContent = row[i] || "";
+            tr.appendChild(td);
+          }
+          tableBody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error("Erro ao renderizar tabela:", error);
+        showError();
+      }
+    }
+
+    // Adicionar ordenação nas colunas
+    document.querySelectorAll('th').forEach((th, index) => {
+      th.addEventListener('click', () => sortTable(index));
+    });
+
+    // Implementar cache local
+    const cachedData = localStorage.getItem('tableData');
+    if (cachedData) {
+      allData = JSON.parse(cachedData);
+      renderTable(allData);
+    }
+
+    showLoading();
     Papa.parse(sheetUrl, {
       download: true,
       header: false,
       complete: function(results) {
-        const allData = results.data.slice(1); // remove cabeçalho
-        renderTable(allData);
-        searchInput.addEventListener("input", () => {
-          const filter = searchInput.value.trim();
-          renderTable(allData, filter);
-        });
+        try {
+          allData = results.data.slice(1);
+          localStorage.setItem('tableData', JSON.stringify(allData));
+          renderTable(allData);
+          
+          searchInput.addEventListener("input", () => {
+            const filter = searchInput.value.trim();
+            renderTable(allData, filter);
+          });
+        } catch (error) {
+          console.error("Erro ao processar dados:", error);
+          showError();
+        }
+      },
+      error: function(error) {
+        console.error("Erro ao carregar dados:", error);
+        showError();
       }
     });
   </script>
