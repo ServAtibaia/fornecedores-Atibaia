@@ -34,7 +34,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
+      table-layout: auto; /* atualizado */
       background-color: #d0f0d0;
       font-size: 0.9rem;
     }
@@ -42,12 +42,8 @@
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      vertical-align: top;
-      white-space: nowrap; /* Impede quebra de linha */
-    }
-
-    td a, td {
       word-break: break-word;
+      vertical-align: top;
     }
 
     th {
@@ -74,11 +70,6 @@
       input {
         font-size: 0.9rem;
       }
-
-      /* Se quiser permitir quebra de linha em telas pequenas, ative abaixo */
-      /* td {
-        white-space: normal;
-      } */
     }
   </style>
 </head>
