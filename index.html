@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0" />
   <title>Serviços em Atibaia</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
@@ -11,17 +11,14 @@
       padding: 1rem;
       margin: 0;
       text-align: center;
-      background-color: #fefefe;
-      font-size: 16px;
+      background-color: #ffffff;
     }
-
     h1 {
-      color: #9b2fff;
+      color: #2e7d32;
       font-size: 2rem;
     }
-
     input {
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-size: 1rem;
       width: 100%;
       max-width: 500px;
@@ -30,7 +27,6 @@
       border-radius: 5px;
       border: 1px solid #aaa;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -38,96 +34,21 @@
       overflow-x: auto;
       display: block;
     }
-
     th, td {
-      border: 1px solid #ddd;
-      padding: 0.5rem;
+      border: 1px solid #ccc;
+      padding: 0.75rem;
       text-align: left;
       word-break: break-word;
     }
-
     th {
-      background-color: #e8d9ff;
+      background-color: #a5d6a7; /* verde claro para o cabeçalho */
     }
-
+    tbody tr:nth-child(even) {
+      background-color: #e8f5e9; /* verde bem claro */
+    }
+    tbody tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
     .footer {
       margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        font-size: 14px;
-      }
-      h1 {
-        font-size: 1.4rem;
-      }
-      th, td {
-        font-size: 0.85rem;
-        padding: 6px;
-      }
-      input {
-        font-size: 0.95rem;
-        padding: 0.4rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <h1>Serviços em Atibaia</h1>
-  <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
-
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>ESPECIALIDADE</th>
-        <th>NOME</th>
-        <th>CONTATO</th>
-        <th>QUEM INDICOU</th>
-        <th>OBSERVAÇÕES</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-
-  <div class="footer">
-    Atualizado automaticamente a partir da planilha do Google Sheets.
-  </div>
-
-  <script>
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
-
-    const searchInput = document.getElementById("searchInput");
-    const tableBody = document.getElementById("tableBody");
-
-    function renderTable(data, filter = "") {
-      tableBody.innerHTML = "";
-      data.forEach(row => {
-        const especialidade = row[0] || "";
-        if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
-        const tr = document.createElement("tr");
-        for (let i = 0; i < 5; i++) {
-          const td = document.createElement("td");
-          td.textContent = row[i] || "";
-          tr.appendChild(td);
-        }
-        tableBody.appendChild(tr);
-      });
-    }
-
-    Papa.parse(sheetUrl, {
-      download: true,
-      header: false,
-      complete: function(results) {
-        const allData = results.data.slice(1); // remove cabeçalho
-        renderTable(allData);
-        searchInput.addEventListener("input", () => {
-          const filter = searchInput.value.trim();
-          renderTable(allData, filter);
-        });
-      }
-    });
-  </script>
-</body>
-</html>
+      font-size: 0
