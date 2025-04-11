@@ -35,15 +35,15 @@
     }
 
     .table-container {
-      overflow-x: auto;
+      overflow-x: auto; /* Habilita scroll horizontal */
       padding: 0 1rem;
+      width: 100%;
     }
 
     table {
       width: 100%;
-      min-width: 800px;
+      min-width: 1000px; /* força a tabela a passar da tela e ativar o scroll */
       border-collapse: collapse;
-      table-layout: auto;
       background-color: #d0f0d0;
       font-size: 0.9rem;
     }
@@ -51,8 +51,8 @@
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      white-space: nowrap; /* Não quebra palavras */
-      word-break: break-word; /* Quebra frases longas */
+      white-space: normal; /* permite quebra de linha */
+      word-break: break-word; /* quebra frases longas */
       overflow-wrap: anywhere;
       vertical-align: top;
     }
@@ -131,7 +131,7 @@
       download: true,
       header: false,
       complete: function(results) {
-        const allData = results.data.slice(1); // remove o cabeçalho
+        const allData = results.data.slice(1); // remove cabeçalho
         renderTable(allData);
         searchInput.addEventListener("input", () => {
           const filter = searchInput.value.trim();
