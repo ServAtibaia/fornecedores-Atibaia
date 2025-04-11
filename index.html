@@ -19,46 +19,49 @@
       font-size: 1.8rem;
     }
 
-    .sticky-input {
+    #searchInput {
       position: sticky;
       top: 0;
-      background-color: #fefefe;
-      padding: 1rem;
-      z-index: 100;
-    }
-
-    input {
+      z-index: 10;
+      background: white;
+      padding: 0.5rem;
+      margin: 0 auto 1rem;
       width: 100%;
       max-width: 500px;
-      padding: 0.5rem;
-      margin: 0 auto;
       display: block;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
 
+    .table-container {
+      overflow-x: auto;
+      padding: 0 1rem;
+    }
+
     table {
       width: 100%;
+      min-width: 800px;
       border-collapse: collapse;
       table-layout: auto;
       background-color: #d0f0d0;
-      font-size: 0.95rem;
-      overflow-x: auto;
+      font-size: 0.9rem;
     }
 
     th, td {
       border: 1px solid #333;
       padding: 0.7rem;
-      white-space: normal;
+      white-space: nowrap; /* Não quebra palavras */
+      word-break: break-word; /* Quebra frases longas */
       overflow-wrap: anywhere;
-      word-break: break-word;
+      vertical-align: top;
     }
 
     th {
-      background-color: #3399ff; /* azul Excel */
+      background-color: #3f88c5;
       color: white;
       font-weight: bold;
+      text-align: left;
     }
 
     tr:nth-child(even) {
@@ -67,46 +70,36 @@
 
     .footer {
       text-align: center;
-      margin: 2rem 0;
+      margin: 2rem 1rem;
       font-size: 0.85rem;
       color: #666;
     }
 
     @media (max-width: 768px) {
       table, thead, tbody, th, td, tr {
-        font-size: 0.85rem;
-      }
-
-      input {
-        font-size: 0.95rem;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
+        font-size: 0.8rem;
       }
     }
   </style>
 </head>
 <body>
   <h1>Serviços em Atibaia</h1>
-  <div class="sticky-input">
-    <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
-  </div>
+  <input type="text" id="searchInput" placeholder="Buscar por especialidade..." />
 
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>ESPECIALIDADE</th>
-        <th>NOME</th>
-        <th>CONTATO</th>
-        <th>QUEM INDICOU</th>
-        <th>OBSERVAÇÕES</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+  <div class="table-container">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>ESPECIALIDADE</th>
+          <th>NOME</th>
+          <th>CONTATO</th>
+          <th>QUEM INDICOU</th>
+          <th>OBSERVAÇÕES</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
   <div class="footer">
     Atualizado automaticamente a partir da planilha do Google Sheets.
@@ -123,6 +116,7 @@
       data.forEach(row => {
         const especialidade = row[0] || "";
         if (filter && !especialidade.toLowerCase().includes(filter.toLowerCase())) return;
+
         const tr = document.createElement("tr");
         for (let i = 0; i < 5; i++) {
           const td = document.createElement("td");
@@ -137,7 +131,7 @@
       download: true,
       header: false,
       complete: function(results) {
-        const allData = results.data.slice(1); // remove cabeçalho
+        const allData = results.data.slice(1); // remove o cabeçalho
         renderTable(allData);
         searchInput.addEventListener("input", () => {
           const filter = searchInput.value.trim();
