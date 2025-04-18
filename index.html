@@ -29,7 +29,6 @@
       font-size: 1.8rem;
     }
 
-    /* Modal Styles */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -74,7 +73,6 @@
       background-color: #660066;
     }
 
-    /* Search Styles */
     .search-container {
       position: sticky;
       top: 0;
@@ -102,7 +100,6 @@
       box-shadow: 0 2px 8px rgba(128,0,128,0.2);
     }
 
-    /* Table Styles */
     .table-container {
       overflow-x: auto;
       padding: 0 1rem;
@@ -124,17 +121,22 @@
       border: 1px solid #333;
       padding: 0.7rem;
       vertical-align: top;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
 
     th:nth-child(1), td:nth-child(1) { width: 20%; }
     th:nth-child(2), td:nth-child(2) { width: 20%; }
     th:nth-child(3), td:nth-child(3) { 
       width: 15%; 
-      white-space: normal;
-      line-height: 1.4;
+      white-space: nowrap;
+      word-break: keep-all;
     }
     th:nth-child(4), td:nth-child(4) { width: 20%; }
-    th:nth-child(5), td:nth-child(5) { width: 25%; }
+    th:nth-child(5), td:nth-child(5) {
+      width: 25%;
+      white-space: normal;
+    }
 
     th {
       background-color: #3f88c5;
@@ -152,14 +154,13 @@
       background-color: #e6ffe6;
     }
 
-    .loading td {
+    .loading td,
+    .no-results td {
       text-align: center;
       padding: 2rem;
     }
 
     .no-results td {
-      text-align: center;
-      padding: 2rem;
       color: #666;
     }
 
@@ -205,13 +206,12 @@
   </style>
 </head>
 <body>
-  <!-- Modal de Aviso -->
   <div id="disclaimerModal" class="modal-overlay">
     <div class="modal">
       <div class="modal-content">
         ATENÇÃO!!!
 
-        Os administradores dos grupos Amigos do Bairro e Negócios do Bairro não tem nada a ver com as escolhas pessoais dos profissionais listados, que são gentilmente indicados pelos vizinhos. 
+        Os administradores dos grupos Amigos do Bairro e Negócios do Bairro não têm nada a ver com as escolhas pessoais dos profissionais listados, que são gentilmente indicados pelos vizinhos.
 
         Porém, se houver algum problema com um profissional, podem entrar em contato comigo, para que eu tire do banco de dados. E, se o profissional não atende mais, por favor, avisem também. @Janete
       </div>
@@ -238,11 +238,11 @@
     <table id="dataTable" aria-label="Lista de serviços em Atibaia">
       <thead>
         <tr>
-          <th role="columnheader" aria-sort="none">ESPECIALIDADE</th>
-          <th role="columnheader" aria-sort="none">NOME</th>
-          <th role="columnheader" aria-sort="none">CONTATO</th>
-          <th role="columnheader" aria-sort="none">QUEM INDICOU</th>
-          <th role="columnheader" aria-sort="none">OBSERVAÇÕES</th>
+          <th>ESPECIALIDADE</th>
+          <th>NOME</th>
+          <th>CONTATO</th>
+          <th>QUEM INDICOU</th>
+          <th>OBSERVAÇÕES</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -254,30 +254,18 @@
   </div>
 
   <script>
+    function acceptDisclaimer() {
+      document.getElementById('disclaimerModal').style.display = 'none';
+    }
+
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXqUSxh-ODHdT4X5tMKyZsgxVldGkyQVgR5zv9kq_hvY0HFSjz-KhvktaedM5SGxsoHYT2IdN2B1Bj/pub?gid=0&single=true&output=csv";
     const searchInput = document.getElementById("searchInput");
     const tableBody = document.getElementById("tableBody");
     const offlineMessage = document.getElementById("offlineMessage");
     let allData = [];
 
-    // Gerenciamento do Modal
-    function acceptDisclaimer() {
-      document.getElementById('disclaimerModal').style.display = 'none';
-      localStorage.setItem('disclaimerAccepted', 'true');
-    }
-
-    // Verifica se já aceitou o aviso
-    if (localStorage.getItem('disclaimerAccepted')) {
-      document.getElementById('disclaimerModal').style.display = 'none';
-    }
-
-    window.addEventListener('online', () => {
-      offlineMessage.style.display = 'none';
-    });
-    
-    window.addEventListener('offline', () => {
-      offlineMessage.style.display = 'block';
-    });
+    window.addEventListener('online', () => offlineMessage.style.display = 'none');
+    window.addEventListener('offline', () => offlineMessage.style.display = 'block');
 
     function showLoading() {
       tableBody.innerHTML = '<tr class="loading"><td colspan="5">Carregando dados...</td></tr>';
